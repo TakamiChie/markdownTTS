@@ -9,6 +9,14 @@ body {
 #controls {
   padding: 4px;
   background: #eee;
+  display: flex;
+  align-items: center;
+}
+
+#controls label {
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
 }
 
 #container {
@@ -31,4 +39,32 @@ body {
 
 .current {
   background: yellow;
+}
+
+/* css/style.css に追加するスタイルの例 */
+#controls button {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  /* ボタンを円形に */
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 4px;
+  padding: 0;
+  color: #333;
+  /* アイコンの色 */
+  transition: background-color 0.2s;
+}
+
+#controls button:hover {
+  background-color: #f0f0f0;
+}
+
+#controls button svg {
+  width: 24px;
+  height: 24px;
 }
