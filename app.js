@@ -31,12 +31,10 @@ function updateVoices() {
   voiceBox.innerHTML = '';
   voices.forEach((v, i) => {
     const opt = document.createElement('option');
-    opt.value = i;
+    opt.value = v.name;
     opt.textContent = v.name;
     voiceBox.appendChild(opt);
   });
-  const saved = localStorage.getItem('voice');
-  if (saved && voices[saved]) voiceBox.value = saved;
 }
 
 speechSynthesis.onvoiceschanged = updateVoices;
@@ -118,7 +116,8 @@ function speakElement(el, callback) {
     u.volume = volume;
     u.pitch = pitch;
     u.rate = rate;
-    u.voice = voices[voiceBox.value];
+    const selectedVoiceName = voiceBox.value;
+    u.voice = voices.find(v => v.name === selectedVoiceName);
     u.onend = () => speakNodes(idx + 1);
     speechSynthesis.speak(u);
   };
