@@ -81,8 +81,11 @@ function highlight(idx) {
 
 // 読み上げ実行
 function speakCurrent() {
-  if (current < 0 || current >= paragraphs.length) {
+  if (current < 0) {
     return;
+  }
+  if (current >= paragraphs.length) {
+    current = 0; // 範囲外なら最初に戻る
   }
   const text = paragraphs[current].textContent;
   if (!text.trim()) {
