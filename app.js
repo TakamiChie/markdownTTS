@@ -85,7 +85,9 @@ function isHeading(el) {
 // 要素を読み上げ
 function speakElement(el, callback) {
   const children = Array.from(el.childNodes);
-  const base = parseFloat(volumeBar.value);
+  const baseVolume = parseFloat(volumeBar.value);
+  const basePitch = parseFloat(pitchBar.value);
+  const baseRate = parseFloat(rateBox.value);
 
   const speakNodes = idx => {
     if (idx >= children.length) {
@@ -94,13 +96,18 @@ function speakElement(el, callback) {
     }
     const node = children[idx];
     let text = '';
-    let vol = base;
+    let volume = baseVolume;
+    let pitch = basePitch;
+    let rate = baseRate;
+
     if (node.nodeType === Node.TEXT_NODE) {
       text = node.textContent;
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       text = node.textContent;
       if (['EM', 'STRONG'].includes(node.tagName)) {
-        vol = Math.min(base * 1.2, 1);
+        volume = Math.min(baseVolume * 1.3, 1); // 音量を少し上げる
+        pitch = Math.max(basePitch - 0.2, 0);   // ピッチを少し下げる
+        rate = Math.max(baseRate * 0.9, 0.1);  // レートを少し遅くする
       }
     }
     if (!text.trim()) {
@@ -108,9 +115,9 @@ function speakElement(el, callback) {
       return;
     }
     const u = new SpeechSynthesisUtterance(text);
-    u.volume = vol;
-    u.pitch = parseFloat(pitchBar.value);
-    u.rate = parseFloat(rateBox.value);
+    u.volume = volume;
+    u.pitch = pitch;
+    u.rate = rate;
     u.voice = voices[voiceBox.value];
     u.onend = () => speakNodes(idx + 1);
     speechSynthesis.speak(u);
