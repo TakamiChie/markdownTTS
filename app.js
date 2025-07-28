@@ -53,7 +53,12 @@ function updatePreview() {
     const html = marked.parse(line || ' ');
     const div = document.createElement('div');
     div.innerHTML = html;
-    const el = div.firstElementChild;
+    let el = div.firstElementChild;
+    if (!el) {
+      // パース結果が空の場合はプレーンテキストとして扱う
+      el = document.createElement('p');
+      el.textContent = line;
+    }
     el.dataset.index = idx;
     el.addEventListener('click', () => {
       current = idx;
@@ -76,8 +81,11 @@ function highlight(idx) {
 
 // 読み上げ実行
 function speakCurrent() {
-  if (current < 0 || current >= paragraphs.length) {
+  if (current < 0) {
     return;
+  }
+  if (current >= paragraphs.length) {
+    current = 0; // 範囲外なら最初に戻る
   }
   const text = paragraphs[current].textContent;
   if (!text.trim()) {
