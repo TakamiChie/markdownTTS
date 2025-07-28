@@ -77,6 +77,56 @@ function highlight(idx) {
 }
 
 // 読み上げ実行
+// 見出しかどうか判定
+function isHeading(el) {
+  return /^H[1-6]$/.test(el.tagName);
+}
+
+// 要素を読み上げ
+function speakElement(el, callback) {
+  const children = Array.from(el.childNodes);
+  const baseVolume = parseFloat(volumeBar.value);
+  const basePitch = parseFloat(pitchBar.value);
+  const baseRate = parseFloat(rateBox.value);
+
+  const speakNodes = idx => {
+    if (idx >= children.length) {
+      callback();
+      return;
+    }
+    const node = children[idx];
+    let text = '';
+    let volume = baseVolume;
+    let pitch = basePitch;
+    let rate = baseRate;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      text = node.textContent;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      text = node.textContent;
+      if (['EM', 'STRONG'].includes(node.tagName)) {
+        volume = Math.min(baseVolume * 1.3, 1); // 音量を少し上げる
+        pitch = Math.max(basePitch - 0.2, 0);   // ピッチを少し下げる
+        rate = Math.max(baseRate * 0.9, 0.1);  // レートを少し遅くする
+      }
+    }
+    if (!text.trim()) {
+      speakNodes(idx + 1);
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(text);
+    u.volume = volume;
+    u.pitch = pitch;
+    u.rate = rate;
+    u.voice = voices[voiceBox.value];
+    u.onend = () => speakNodes(idx + 1);
+    speechSynthesis.speak(u);
+  };
+
+  speakNodes(0);
+}
+
+// 読み上げ実行
 function speakCurrent() {
   if (current < 0) {
     return;
@@ -84,26 +134,38 @@ function speakCurrent() {
   if (current >= paragraphs.length) {
     current = 0; // 範囲外なら最初に戻る
   }
-  const text = paragraphs[current].textContent;
-  if (!text.trim()) {
+  const el = paragraphs[current];
+  if (!el.textContent.trim()) {
     current++;
     speakCurrent();
     return;
   }
-  const u = new SpeechSynthesisUtterance(text);
-  u.volume = parseFloat(volumeBar.value);
-  u.pitch = parseFloat(pitchBar.value);
-  u.rate = parseFloat(rateBox.value);
-  u.voice = voices[voiceBox.value];
+
   highlight(current);
-  u.onend = () => {
+
+  const after = () => {
     paragraphs[current].classList.remove('current');
     current++;
     if (current < paragraphs.length) {
       speakCurrent();
     }
   };
-  speechSynthesis.speak(u);
+
+  const start = () => {
+    speakElement(el, () => {
+      if (isHeading(el)) {
+        setTimeout(after, 250);
+      } else {
+        after();
+      }
+    });
+  };
+
+  if (isHeading(el)) {
+    setTimeout(start, 250);
+  } else {
+    start();
+  }
 }
 
 // 各種操作
