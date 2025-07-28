@@ -14,19 +14,16 @@ let paragraphs = [];
 let current = 0;
 let voices = [];
 
-// 設定読み込み
-function loadSettings() {
-  volumeBar.value = localStorage.getItem('volume') || 1;
-  pitchBar.value = localStorage.getItem('pitch') || 1;
-  const rate = localStorage.getItem('rate') || 1;
+document.addEventListener('DOMContentLoaded', () => {
   for (let i = 0.5; i <= 4; i += 0.5) {
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = i + '倍';
+    if (i == 1) opt.selected = true; // デフォルトは1倍速
     if (i == rate) opt.selected = true;
     rateBox.appendChild(opt);
   }
-}
+});
 
 // 声質更新
 function updateVoices() {
@@ -139,24 +136,7 @@ prevBtn.addEventListener('click', () => {
   speakCurrent();
 });
 
-volumeBar.addEventListener('change', () => {
-  localStorage.setItem('volume', volumeBar.value);
-});
-
-pitchBar.addEventListener('change', () => {
-  localStorage.setItem('pitch', pitchBar.value);
-});
-
-rateBox.addEventListener('change', () => {
-  localStorage.setItem('rate', rateBox.value);
-});
-
-voiceBox.addEventListener('change', () => {
-  localStorage.setItem('voice', voiceBox.value);
-});
-
 // 初期処理
-loadSettings();
 updateVoices();
 updatePreview();
 
