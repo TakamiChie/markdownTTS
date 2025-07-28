@@ -70,8 +70,13 @@ textarea.addEventListener('input', updatePreview);
 
 // 行ハイライト
 function highlight(idx) {
-  paragraphs.forEach(p => p.classList.remove('current'));
-  if (paragraphs[idx]) paragraphs[idx].classList.add('current');
+  paragraphs.forEach(p => p.classList.remove('current'))
+  const target = paragraphs[idx]
+  if (target) {
+    target.classList.add('current')
+    // 読み上げ中の要素が常に画面内に入るようスクロール
+    target.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
 }
 
 // 読み上げ実行
