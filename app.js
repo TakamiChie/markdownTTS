@@ -53,7 +53,12 @@ function updatePreview() {
     const html = marked.parse(line || ' ');
     const div = document.createElement('div');
     div.innerHTML = html;
-    const el = div.firstElementChild;
+    let el = div.firstElementChild;
+    if (!el) {
+      // パース結果が空の場合はプレーンテキストとして扱う
+      el = document.createElement('p');
+      el.textContent = line;
+    }
     el.dataset.index = idx;
     el.addEventListener('click', () => {
       current = idx;
