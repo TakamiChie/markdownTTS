@@ -1,4 +1,5 @@
-const CACHE_NAME = 'markdownTTS-cache-v1';
+// 新しいキャッシュ戦略を適用するため、バージョンを更新
+const CACHE_NAME = 'markdownTTS-cache-v3';
 const FILES = [
   '/',
   '/index.html',
@@ -28,7 +29,20 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Stale-While-Revalidate 戦略
+  // ナビゲーションリクエスト以外に適用
+  if (event.request.mode === 'navigate') {
+    return;
+  }
   event.respondWith(
-    caches.match(event.request).then(resp => resp || fetch(event.request))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.match(event.request).then(cachedResponse => {
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+        return cachedResponse || fetchPromise;
+      });
+    })
   );
 });

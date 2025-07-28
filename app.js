@@ -201,9 +201,36 @@ prevBtn.addEventListener('click', () => {
 updateVoices();
 updatePreview();
 
+function showUpdateNotification() {
+  const notificationBar = document.createElement('div');
+  notificationBar.id = 'update-notification';
+  notificationBar.innerHTML = `<span>新しいバージョンが利用可能です。</span><button id="reload-button">更新</button>`;
+  document.body.appendChild(notificationBar);
+
+  document.getElementById('reload-button').addEventListener('click', () => {
+    window.location.reload();
+  });
+}
+
 // サービスワーカー登録
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js');
+    navigator.serviceWorker.register('service-worker.js')
+      .then(registration => {
+        // 新しいサービスワーカーがインストールされるのを監視
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            // 新しいワーカーのインストールが完了し、
+            // 古いワーカーがまだページをコントロールしている場合に通知を表示
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateNotification();
+            }
+          });
+        });
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
   });
 }
