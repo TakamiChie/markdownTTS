@@ -38,7 +38,9 @@ self.addEventListener('fetch', event => {
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(event.request).then(cachedResponse => {
         const fetchPromise = fetch(event.request).then(networkResponse => {
-          cache.put(event.request, networkResponse.clone());
+          if (event.request.url.startsWith('http')) {
+            cache.put(event.request, networkResponse.clone());
+          }
           return networkResponse;
         });
         return cachedResponse || fetchPromise;
