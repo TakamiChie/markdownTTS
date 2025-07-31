@@ -36,15 +36,20 @@
     <label>音量<input id="volume" type="range" class="savecontrol" min="0" max="1" step="0.1"></label>
     <label>ピッチ<input id="pitch" type="range" class="savecontrol" min="0" max="2" step="0.1"></label>
     <label>速度<select id="rate" class="savecontrol"></select></label>
-    <label>声質<select id="voice" class="savecontrol"></select></label>
+      <label>声質<select id="voice" class="savecontrol"></select></label>
+      <label>絵文字除去<input id="removeEmoji" type="checkbox" class="savecontrol"></label>
   </div>
   <div id="container">
     <textarea id="markdown" placeholder="Markdownテキストを入力"></textarea>
     <div id="preview"></div>
   </div>
-  <script src="js/saveControls.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.1.1/lib/marked.umd.js"></script>
-  <script src="app.js"></script>
-</body>
+    <script src="js/saveControls.js"></script>
+    <script type="module">
+      import emojiRegex from 'https://raw.githubusercontent.com/mathiasbynens/emoji-regex/v10.3.0/index.mjs';
+      window.getEmojiRegex = emojiRegex;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.1.1/lib/marked.umd.js"></script>
+    <script src="app.js"></script>
+  </body>
 
 </html>

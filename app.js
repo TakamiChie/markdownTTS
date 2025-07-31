@@ -9,6 +9,7 @@ const volumeBar = document.getElementById('volume');
 const pitchBar = document.getElementById('pitch');
 const rateBox = document.getElementById('rate');
 const voiceBox = document.getElementById('voice');
+const removeEmoji = document.getElementById('removeEmoji'); // 絵文字を除去するか
 
 let paragraphs = [];
 let current = 0;
@@ -112,6 +113,10 @@ function speakElement(el, callback) {
         pitch = Math.max(basePitch - 0.2, 0);   // ピッチを少し下げる
         rate = Math.max(baseRate * 0.9, 0.1);  // レートを少し遅くする
       }
+    }
+    if (removeEmoji.checked) {
+      const regex = window.getEmojiRegex();
+      text = text.replace(regex, '');
     }
     if (!text.trim()) {
       speakNodes(idx + 1);
