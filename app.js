@@ -31,7 +31,7 @@ function updateVoices() {
   voiceBox.innerHTML = '';
   voices.forEach((v, i) => {
     const opt = document.createElement('option');
-    opt.value = v.name;
+    opt.value = i;
     opt.textContent = v.name;
     voiceBox.appendChild(opt);
   });
@@ -121,7 +121,7 @@ function speakElement(el, callback) {
     u.volume = volume;
     u.pitch = pitch;
     u.rate = rate;
-    const selectedVoiceName = voiceBox.value;
+    const selectedVoiceName = voiceBox.selectedOptions[0].textContent;
     u.voice = voices.find(v => v.name === selectedVoiceName);
     u.onend = () => speakNodes(idx + 1);
     speechSynthesis.speak(u);
