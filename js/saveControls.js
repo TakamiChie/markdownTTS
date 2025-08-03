@@ -11,6 +11,12 @@
         if (stored !== null) {
           if (ctrl.type === 'checkbox') {
             ctrl.checked = stored === 'true';
+          } else if (ctrl.tagName.toLowerCase() === 'select' && ctrl.hasAttribute('data-byname')) {
+            // textContentで復元
+            const found = Array.from(ctrl.options).find(opt => opt.textContent === stored);
+            if (found) {
+              ctrl.value = found.value;
+            }
           } else if (ctrl.tagName.toLowerCase() === 'select') {
             const exists = Array.from(ctrl.options).some(opt => opt.value === stored);
             if (exists) {
@@ -28,7 +34,12 @@
       if (ctrl.tagName.toLowerCase() === 'select') {
         const observer = new MutationObserver(() => {
           restore();
-          if (ctrl.value === stored) {
+          if (ctrl.hasAttribute('data-byname')) {
+            const found = Array.from(ctrl.options).find(opt => opt.textContent === stored);
+            if (found && ctrl.value === found.value) {
+              observer.disconnect();
+            }
+          } else if (ctrl.value === stored) {
             observer.disconnect();
           }
         });
@@ -37,7 +48,15 @@
 
       // 値が変化したら保存
       const save = () => {
-        const value = ctrl.type === 'checkbox' ? ctrl.checked : ctrl.value;
+        let value;
+        if (ctrl.type === 'checkbox') {
+          value = ctrl.checked;
+        } else if (ctrl.tagName.toLowerCase() === 'select' && ctrl.hasAttribute('data-byname')) {
+          // 選択中optionのtextContentを保存
+          value = ctrl.options[ctrl.selectedIndex]?.textContent ?? '';
+        } else {
+          value = ctrl.value;
+        }
         stored = value.toString();
         localStorage.setItem(key, stored);
       };
