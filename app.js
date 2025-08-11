@@ -9,6 +9,7 @@ const volumeBar = document.getElementById('volume');
 const pitchBar = document.getElementById('pitch');
 const rateBox = document.getElementById('rate');
 const voiceBox = document.getElementById('voice');
+const voiceSearch = document.getElementById('voice-search');
 
 let paragraphs = [];
 let current = 0;
@@ -25,19 +26,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// 声質リストを描画
+function renderVoices(keyword = '') {
+  const selected = voiceBox.selectedOptions[0]?.textContent;
+  voiceBox.innerHTML = '';
+  voices
+    .filter(v => v.name.toLowerCase().includes(keyword.toLowerCase()))
+    .forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = voices.indexOf(v);
+      opt.textContent = v.name;
+      if (v.name === selected) opt.selected = true;
+      voiceBox.appendChild(opt);
+    });
+}
+
 // 声質更新
 function updateVoices() {
   voices = speechSynthesis.getVoices();
-  voiceBox.innerHTML = '';
-  voices.forEach((v, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = v.name;
-    voiceBox.appendChild(opt);
-  });
+  renderVoices(voiceSearch.value);
 }
 
 speechSynthesis.onvoiceschanged = updateVoices;
+
+// 声質検索
+voiceSearch.addEventListener('input', () => {
+  renderVoices(voiceSearch.value);
+});
 
 // プレビュー更新
 function updatePreview() {
