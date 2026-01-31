@@ -13,6 +13,7 @@ const voiceBox = document.getElementById('voice');
 let paragraphs = [];
 let current = 0;
 let voices = [];
+let selectedVoiceName = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   for (let i = 0.5; i <= 4; i += 0.5) {
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 声質更新
 function updateVoices() {
+  const previousVoiceName = selectedVoiceName || voiceBox.selectedOptions[0]?.textContent || '';
   voices = speechSynthesis.getVoices();
   voiceBox.innerHTML = '';
   voices.forEach((v, i) => {
@@ -35,9 +37,21 @@ function updateVoices() {
     opt.textContent = v.name;
     voiceBox.appendChild(opt);
   });
+  const match = voices.findIndex(v => v.name === previousVoiceName);
+  if (match >= 0) {
+    voiceBox.selectedIndex = match;
+    selectedVoiceName = voices[match].name;
+  } else if (voices.length > 0) {
+    voiceBox.selectedIndex = 0;
+    selectedVoiceName = voices[0].name;
+  }
 }
 
 speechSynthesis.onvoiceschanged = updateVoices;
+
+voiceBox.addEventListener('change', () => {
+  selectedVoiceName = voiceBox.selectedOptions[0]?.textContent || '';
+});
 
 // プレビュー更新
 function updatePreview() {
@@ -121,8 +135,8 @@ function speakElement(el, callback) {
     u.volume = volume;
     u.pitch = pitch;
     u.rate = rate;
-    const selectedVoiceName = voiceBox.selectedOptions[0].textContent;
-    u.voice = voices.find(v => v.name === selectedVoiceName);
+    const currentVoiceName = voiceBox.selectedOptions[0]?.textContent || selectedVoiceName;
+    u.voice = voices.find(v => v.name === currentVoiceName);
     u.onend = () => speakNodes(idx + 1);
     speechSynthesis.speak(u);
   };
