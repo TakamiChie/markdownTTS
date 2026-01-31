@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 声質更新
 function updateVoices() {
-  const previousVoiceName = selectedVoiceName || voiceBox.selectedOptions[0]?.textContent || '';
+  const storedVoiceName = localStorage.getItem('save_voice') ?? '';
+  const previousVoiceName = selectedVoiceName || voiceBox.selectedOptions[0]?.textContent || storedVoiceName;
   voices = speechSynthesis.getVoices();
   voiceBox.innerHTML = '';
   voices.forEach((v, i) => {
